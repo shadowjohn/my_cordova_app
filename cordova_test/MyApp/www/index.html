@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="https://3wa.tw/inc/javascript/bootstrap/3.4.0/css/bootstrap-theme.min.css" />
     <link rel="stylesheet" href="https://3wa.tw/inc/javascript/bootstrap/3.4.0/css_custom/css_patch.css" />
     <script src="js/gps.js"></script>
+    <script src="js/include.js"></script>
     <style>
         html, body {
             width: 100vw;
@@ -105,13 +106,13 @@
                     //API of device is below 30. Here, you can request WRITE_EXTERNAL_STORAGE permission here using cordova-plugin-android-permissions
                 }
             });
-
+            window['build_entities'] = [];
             window['map'] = new Easymap('map');
             window['map'].set3DCesiumPath("https://3dmap.focusit.com.tw/easymap_data/Cesium-1.120/build/Cesium/Cesium.js");
             window['map']._setLayersIndex = function () { }; // 這個有 bug
             window['map'].statusbar.is_enable_z = true;
             window['map'].enable3D(function () {
-
+                window['viewer'] = window['map'].get3DViewer();
 
                 //以下是放在 deviceready 以後的
                 //check permission
@@ -129,23 +130,32 @@
                 // 套建物
                 $("input[reqc='btnBuilding']").off().click(function () {
                     window['dbObj'] = window.sqlitePlugin.openDatabase({
-                        name:  cordova.file.externalRootDirectory.replace("file://","") + 'Download/8.db',
+                        name: cordova.file.externalRootDirectory.replace("file://", "") + 'Download/8.db',
                         location: 'system'
-                    });    
+                    });
                     //alert(window['dbPath']);
                     //alert(window['dbObj']);
                     window['dbObj'].transaction(function (tx) {
                         var c = window['map'].getCenter();
                         var SQL = `
-                        SELECT *
-                        FROM \`8_index\`
-                        WHERE
-                        1=1
-                           AND \`x\` BETWEEN ? - 0.01 AND ? + 0.01
-                           AND \`y\` BETWEEN ? - 0.01 AND ? + 0.01
-                        ORDER BY ABS(? - \`x\`) + ABS(? - \`y\`)
-                        LIMIT 200
-                        `;
+                                    SELECT
+                                        \`ogc_fid\`,
+                                        \`GEOMETRY_WKT\` AS \`ORZ_WKT\`,
+                                        \`B1D\`
+                                    FROM
+                                        \`8\`
+                                    WHERE
+                                        \`ogc_fid\` IN (
+                                            SELECT \`pkid\`
+                                            FROM \`8_index\`
+                                            WHERE
+                                            1=1
+                                               AND \`x\` BETWEEN ? - 0.01 AND ? + 0.01
+                                               AND \`y\` BETWEEN ? - 0.01 AND ? + 0.01
+                                            ORDER BY ABS(? - \`x\`) + ABS(? - \`y\`)
+                                            LIMIT 200
+                                        )
+                                    `;
                         console.log(SQL);
                         var pa = [
                             c.lon, c.lon,
@@ -159,9 +169,80 @@
                             function (tx, res) {
                                 console.log("筆數:", res.rows.length);
 
-                                for (let i = 0; i < res.rows.length; i++) {
-                                    console.log(res.rows.item(i));
+                                //for (let i = 0; i < res.rows.length; i++) {
+                                //console.log(res.rows.item(i));
+
+
+
+
+
+
+
+                                if (window['build_entities'].length > 3500) {
+                                    window['build_entities'].slice(0, 1000).forEach(function (v) {
+                                        window['viewer'].entities.remove(v);
+                                    });
+
+                                    // 保留剩下的
+                                    window['build_entities'] = window['build_entities'].slice(1000);
                                 }
+                                for (let i = 0; i < res.rows.length; i++) {
+                                    var v = res.rows.item(i);
+                                    console.log(v);
+                                    var wkt = v.ORZ_WKT;
+
+                                    /*if (wkt.indexOf("GEOMETRYCOLLECTION") == 0) {
+                                      wkt = str_replace("GEOMETRYCOLLECTION(", "", wkt);
+                                      wkt = wkt.substr(0, wkt.length - 1);
+                                    }*/
+                                    //console.log(wkt);
+                                    // if (wkt.indexOf("POLYGON(") == 0) {
+                                    //B1A 圖名代碼 文字 8 圖層名稱
+                                    //B0001
+
+                                    //B1B 房屋型態碼 文字 1
+                                    //B1C 房屋結構碼 文字 1
+                                    //B1D 建物樓層數 數字 2(地上樓層)
+                                    //B1E 更新年度 數字 4
+                                    //B1F 備註 文字 20
+                                    var isfind = false;
+                                    window['build_entities'].map(function (vv) {
+                                        if (vv.easydata.ogc_fid == v.ogc_fid) {
+                                            isfind = true;
+                                            return false;
+                                        }
+                                    });
+
+                                    if (isfind) {
+                                        console.log("found ... jump");
+                                        continue;
+                                    }
+                                    var d = {
+                                        "easydata": {
+                                            "ogc_fid": v.ogc_fid
+                                        },
+                                        "polygon": {
+                                            material: {
+                                                alpha: 0.8,
+                                                blue: arduino_map(rand(0, 255), 0, 1),
+                                                green: 1,
+                                                red: 1
+
+                                            },
+                                        }
+                                    };
+                                    window['build_entities'].push(drawPolygonWKT(wkt, 0, 3.5 * v.b1d, d));
+
+                                    //}
+                                }
+
+
+
+
+
+
+
+
                             },
                             function (tx, error) {
                                 console.log("SQL 錯誤:", error.message);
