@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36623.8 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "www", ".", "{FD7D9DA2-0D1A-7D82-9420-7E8BC7479A52}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_5853"
+		Debug.AspNetCompiler.PhysicalPath = "D:\opt\my_cordova_app\cordova_test\MyApp\www\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_5853\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_5853"
+		Release.AspNetCompiler.PhysicalPath = "D:\opt\my_cordova_app\cordova_test\MyApp\www\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_5853\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "5853"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FD7D9DA2-0D1A-7D82-9420-7E8BC7479A52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD7D9DA2-0D1A-7D82-9420-7E8BC7479A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5F0244A3-522D-4803-8EF6-9F2C4AD98E7C}
+	EndGlobalSection
+EndGlobal

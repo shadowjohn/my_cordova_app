@@ -33,3 +33,5 @@ google-services.json
 # Android Profiling
 *.hprof
 /cordova_test/node_modules
+/cordova_test/MyApp/www/.vs/www/config
+/cordova_test/MyApp/www/.vs/www/v17
